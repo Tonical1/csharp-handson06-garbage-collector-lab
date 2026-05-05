@@ -14,15 +14,16 @@ class Program
 
         // 1) Vazamento por evento não desinscrito
         var publisher = new Publisher();
-        var subscriber = new LeakySubscriber(publisher);
+        using var subscriber = new LeakySubscriber(publisher);
         tracker.Track("subscriber", subscriber);
+        subscriber.Dispose();
 
         // 2) LOH + cache estático sem política de expiração
         var lohBuffer = BigBufferHolder.Run();
         tracker.Track("lohBuffer", lohBuffer);
 
         // 3) Pinned buffer mantido por muito tempo
-        var pinner = new Pinner();
+        using var pinner = new Pinner();
         var pinned = pinner.PinLongTime();
         tracker.Track("pinnedBuffer", pinned);
 
@@ -42,7 +43,7 @@ class Program
         Console.WriteLine($"New payload length: {payloadnew.Length} | Time: {sw2.ElapsedMilliseconds} ms");
 
         // 5) Recurso externo sem Dispose (usar finalizer como 'rede de segurança')
-        var logger = new Logger("log.txt");
+        using var logger = new Logger("log.txt");
         logger.WriteLines(10);
         tracker.Track("logger", logger);
 
@@ -50,10 +51,16 @@ class Program
         publisher.Raise();
 
         // Remover referências locais (mas problemas permanecem)
-        subscriber = null;
+        subscriber.Dispose();
+
         publisher = null;
+
         pinned = null;
-        logger = null;
+        pinner.Dispose();
+
+        logger.Dispose();
+
+        BigBufferHolder.Clear();
         lohBuffer = null;
 
         // Força coletas e verifica sobreviventes

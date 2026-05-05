@@ -3,12 +3,18 @@
 // =====================================================
 // 2) LOH + cache estático sem política de expiração
 // =====================================================
-static class BigBufferHolder
+class BigBufferHolder
 {
+    private static byte[] _buffer;
+
     public static byte[] Run()
-    {        
-        var data = new byte[200_000]; // ~200KB → LOH
-        GlobalCache.Add(data);
-        return data;
+    {
+        _buffer = new byte[85000]; // Aloca no LOH
+        return _buffer;
+    }
+
+    public static void Clear()
+    {
+        _buffer = null;
     }
 }
