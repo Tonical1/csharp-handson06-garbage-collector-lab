@@ -1,4 +1,5 @@
 ﻿namespace GCLab;
+using System.Diagnostics;
 
 class Program
 {
@@ -26,8 +27,19 @@ class Program
         tracker.Track("pinnedBuffer", pinned);
 
         // 4) Concatenação de string ineficiente
+        Console.WriteLine("--- Comparação entre métodos de concatenação ---");
+
+        var sw1 = Stopwatch.StartNew();
         var payload = ConcatWork.Bad();
-        Console.WriteLine($"Payload length: {payload.Length}");
+        sw1.Stop();
+
+        Console.WriteLine($"Old Payload length: {payload.Length} | Time: {sw1.ElapsedMilliseconds} ms");
+
+        var sw2 = Stopwatch.StartNew();
+        var payloadnew = ConcatWork.Good();
+        sw2.Stop();
+
+        Console.WriteLine($"New payload length: {payloadnew.Length} | Time: {sw2.ElapsedMilliseconds} ms");
 
         // 5) Recurso externo sem Dispose (usar finalizer como 'rede de segurança')
         var logger = new Logger("log.txt");
