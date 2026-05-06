@@ -14,6 +14,10 @@ class Program
         var tracker = new IssueTracker();
         InitProgram( tracker );
 
+        // Força coletas e verifica sobreviventes
+        GCHelpers.FullCollect();
+        tracker.Report();
+
         Console.WriteLine(tracker.HasSurvivors
             ? "\n❌ Existem sobreviventes indesejados. Sua missão: corrigir o código e rodar novamente."
             : "\n✅ GC limpo: nenhuma referência indesejada permaneceu viva.");
@@ -62,8 +66,6 @@ class Program
 
         logger.Dispose();
 
-        // Força coletas e verifica sobreviventes
-        GCHelpers.FullCollect();
-        tracker.Report();
+        
     }
 }
