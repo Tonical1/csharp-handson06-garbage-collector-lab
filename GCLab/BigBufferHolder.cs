@@ -5,16 +5,16 @@
 // =====================================================
 class BigBufferHolder
 {
-    private static byte[] _buffer;
-
+    private static readonly List<byte[]> _cache = new();
     public static byte[] Run()
     {
-        _buffer = new byte[85000]; // Aloca no LOH
-        return _buffer;
+        var data = new byte[100_000]; // ~100KB → LOH
+        _cache.Add(data);
+        return data;
     }
 
-    public static void Clear()
+    public static void Dispose()
     {
-        _buffer = null;
+        _cache.Clear();
     }
 }

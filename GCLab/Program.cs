@@ -20,20 +20,6 @@ class Program
 
     static void InitProgram(IssueTracker tracker)
     {
-        // 1) Vazamento por evento não desinscrito
-        var publisher = new Publisher();
-        using var subscriber = new LeakySubscriber(publisher);
-        tracker.Track("subscriber", subscriber);
-        subscriber.Dispose();
-
-        // 2) LOH + cache estático sem política de expiração
-        var lohBuffer = BigBufferHolder.Run();
-        tracker.Track("lohBuffer", lohBuffer);
-
-        // 3) Pinned buffer mantido por muito tempo
-        using var pinner = new Pinner();
-        var pinned = pinner.PinLongTime();
-        tracker.Track("pinnedBuffer", pinned);
 
         // 4) Concatenação de string ineficiente
         Console.WriteLine("--- Comparação entre métodos de concatenação ---");
@@ -50,26 +36,6 @@ class Program
 
         Console.WriteLine($"New payload length: {payloadnew.Length} | Time: {sw2.ElapsedMilliseconds} ms");
 
-        // 5) Recurso externo sem Dispose (usar finalizer como 'rede de segurança')
-        using var logger = new Logger("log.txt");
-        logger.WriteLines(10);
-        tracker.Track("logger", logger);
-
-        // Dispara evento para "usar" o subscriber
-        publisher.Raise();
-
-        // Remover referências locais (mas problemas permanecem)
-        subscriber.Dispose();
-
-        publisher = null;
-
-        pinned = null;
-        pinner.Dispose();
-
-        logger.Dispose();
-
-        BigBufferHolder.Clear();
-        lohBuffer = null;
 
         // Força coletas e verifica sobreviventes
         GCHelpers.FullCollect();
