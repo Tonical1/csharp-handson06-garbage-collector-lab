@@ -11,7 +11,15 @@ class Program
         Console.WriteLine($"GC Server Mode: {System.Runtime.GCSettings.IsServerGC}\n");
 
         var tracker = new IssueTracker();
+        InitProgram( tracker );
 
+        Console.WriteLine(tracker.HasSurvivors
+            ? "\n❌ Existem sobreviventes indesejados. Sua missão: corrigir o código e rodar novamente."
+            : "\n✅ GC limpo: nenhuma referência indesejada permaneceu viva.");
+    }
+
+    static void InitProgram(IssueTracker tracker)
+    {
         // 1) Vazamento por evento não desinscrito
         var publisher = new Publisher();
         using var subscriber = new LeakySubscriber(publisher);
@@ -66,9 +74,5 @@ class Program
         // Força coletas e verifica sobreviventes
         GCHelpers.FullCollect();
         tracker.Report();
-
-        Console.WriteLine(tracker.HasSurvivors
-            ? "\n❌ Existem sobreviventes indesejados. Sua missão: corrigir o código e rodar novamente."
-            : "\n✅ GC limpo: nenhuma referência indesejada permaneceu viva.");
     }
 }
