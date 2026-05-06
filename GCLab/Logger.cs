@@ -22,13 +22,6 @@ class Logger : IDisposable
 
     public void Dispose()
     {
-        _writer.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
-    ~Logger()
-    {
-        Dispose();
-        Console.WriteLine("~Logger finalizer chamado (não dependa disso)");
+        _writer?.Dispose();
     }
 }

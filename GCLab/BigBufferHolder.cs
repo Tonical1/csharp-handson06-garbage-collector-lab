@@ -13,7 +13,7 @@ class BigBufferHolder
         return data;
     }
 
-    public static void Dispose()
+    public static void Clear()
     {
         _cache.Clear();
     }

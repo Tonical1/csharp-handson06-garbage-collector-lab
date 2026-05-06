@@ -4,6 +4,7 @@ class LeakySubscriber : IDisposable
 {
     private static readonly List<LeakySubscriber> _registry = new();
     private Publisher _publisher;
+    private bool _disposed;
 
     public LeakySubscriber(Publisher publisher)
     {
@@ -12,15 +13,24 @@ class LeakySubscriber : IDisposable
         _registry.Add(this);
     }
 
+    private void Handle() { /* noop */ }
+
     public void Dispose()
     {
+        if (_disposed) return;
+
         if (_publisher != null)
         {
             _publisher.OnSomething -= Handle;
             _publisher = null;
         }
+
         _registry.Remove(this);
+        _disposed = true;
     }
 
-    private void Handle() { /* noop */ }
+    public static void Clear()
+    {
+        _registry.Clear();
+    }
 }
